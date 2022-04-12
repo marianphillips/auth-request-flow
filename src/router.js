@@ -18,7 +18,7 @@ router.post('/login', (req, res) => {
         res.json(jwt.sign({username: mockUser.username}, "secret"))
        }
     else {
-        res.json({error: "invalid username or password"}) 
+        res.status(400).json({error: "invalid username or password"}) 
     }
 
     
@@ -26,11 +26,17 @@ router.post('/login', (req, res) => {
 
 router.get('/profile', (req, res) => {
 
+    const token = req.headers.authorization
+
     try {
-        jwt.verify(req.rawHeaders[5].slice(8, req.rawHeaders[5].length - 1), "secret")
-        return res.json(mockUser)
+        jwt.verify(token.slice(7), "secret")
+        return res.json({profile: mockUser.profile})
       } catch(err) {
-        if(err) return res.json("Error")
+        if(err) {
+            return (
+                res.status(401).json("Error")
+            )
+        } 
       }
 
 
